@@ -16,10 +16,21 @@ func (e *TException) Error() string {
 	return fmt.Sprintf("API Error - %s:", e.Message)
 }
 
-func BadRequestException(message string) *TException {
+func BadRequestException(message interface{}) *TException {
+	var msg string
+
+	switch v := message.(type) {
+	case error:
+		msg = v.Error()
+	case string:
+		msg = v
+	default:
+		msg = "Invalid error message type"
+	}
+
 	return &TException{
 		HttpCode:  http.StatusBadRequest,
-		Message:   message,
+		Message:   msg,
 		Timestamp: time.Now().Format(time.RFC3339),
 	}
 }

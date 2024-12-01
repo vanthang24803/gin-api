@@ -15,7 +15,7 @@ func Register(ctx *gin.Context) {
 
 	data, err := AuthRepository().RegisterHandler(&jsonBody)
 	if err != nil {
-		ctx.JSON(400, util.BadRequestException(err.Error()))
+		ctx.JSON(400, util.BadRequestException(err))
 		return
 	}
 
@@ -32,7 +32,7 @@ func Login(ctx *gin.Context) {
 
 	data, err := AuthRepository().LoginHandler(&jsonBody)
 	if err != nil {
-		ctx.JSON(400, util.BadRequestException(err.Error()))
+		ctx.JSON(400, util.BadRequestException(err))
 		return
 	}
 

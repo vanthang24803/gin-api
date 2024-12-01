@@ -24,7 +24,7 @@ type repos struct {
 func (r *repos) RegisterHandler(json *RegisterRequest) (interface{}, error) {
 	var existingUser models.User
 	if err := r.DB.Where("email = ?", json.Email).First(&existingUser).Error; err != nil && err != gorm.ErrRecordNotFound {
-		return nil, util.BadRequestException(err.Error())
+		return nil, util.BadRequestException(err)
 	}
 
 	var customerRole models.Role
@@ -68,7 +68,7 @@ func (r *repos) LoginHandler(json *LoginRequest) (*TokenResponse, error) {
 		if err == gorm.ErrRecordNotFound {
 			return nil, util.UnauthorizedException()
 		}
-		return nil, util.BadRequestException(err.Error())
+		return nil, util.BadRequestException(err)
 	}
 
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(json.Password))
@@ -97,7 +97,7 @@ func (r *repos) LoginHandler(json *LoginRequest) (*TokenResponse, error) {
 				return nil, util.BadRequestException("Error creating token")
 			}
 		} else {
-			return nil, util.BadRequestException(err.Error())
+			return nil, util.BadRequestException(err)
 		}
 	} else {
 		tokenAccount.Value = refreshToken
@@ -125,7 +125,7 @@ func generateJWTToken(payload *Payload) (string, string, error) {
 
 	accessTokenString, err := accessToken.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
-		return "", "", util.BadRequestException(err.Error())
+		return "", "", util.BadRequestException(err)
 	}
 
 	refreshTokenClaims := jwt.MapClaims{
@@ -138,7 +138,7 @@ func generateJWTToken(payload *Payload) (string, string, error) {
 
 	refreshTokenString, err := refreshToken.SignedString([]byte(os.Getenv("JWT_REFRESH")))
 	if err != nil {
-		return "", "", util.BadRequestException(err.Error())
+		return "", "", util.BadRequestException(err)
 	}
 
 	return accessTokenString, refreshTokenString, nil
