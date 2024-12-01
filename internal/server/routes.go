@@ -1,4 +1,4 @@
-package router
+package server
 
 import (
 	"github.com/gin-gonic/gin"
@@ -8,7 +8,7 @@ import (
 
 func RegisterRouter(app *gin.Engine) {
 	app.NoRoute(func(c *gin.Context) {
-		c.JSON(404, util.NotFoundException("Wrong Router!"))
+		c.JSON(404, util.NotFoundException("Not found route!"))
 	})
 
 	api := app.Group("api")

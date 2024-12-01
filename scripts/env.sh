@@ -1,0 +1,16 @@
+#!/bin/bash
+
+cd ..
+
+cat <<EOL > .env
+PORT=3000
+
+DB_HOST=localhost
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=
+DB_NAME=
+
+JWT_SECRET=
+JWT_REFRESH=
+EOL

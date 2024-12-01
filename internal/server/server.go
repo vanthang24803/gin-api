@@ -8,7 +8,6 @@ import (
 	_ "github.com/vanthang24803/api-ecommerce/internal/config"
 	_ "github.com/vanthang24803/api-ecommerce/internal/database"
 	"github.com/vanthang24803/api-ecommerce/internal/middleware"
-	"github.com/vanthang24803/api-ecommerce/internal/router"
 	"github.com/vanthang24803/api-ecommerce/internal/util"
 )
 
@@ -20,7 +19,7 @@ func Application() {
 	app.Use(middleware.LoggerMiddleware())
 	app.Use(middleware.ErrorHandlingMiddleware())
 
-	router.RegisterRouter(app)
+	RegisterRouter(app)
 
 	log.Printf("Application listing on port %s", PORT)
 
