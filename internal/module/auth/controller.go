@@ -2,11 +2,12 @@ package auth
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/vanthang24803/api-ecommerce/internal/dto"
 	"github.com/vanthang24803/api-ecommerce/internal/util"
 )
 
 func Register(ctx *gin.Context) {
-	var jsonBody RegisterRequest
+	var jsonBody dto.RegisterRequest
 
 	if e := ctx.ShouldBindJSON(&jsonBody); e != nil {
 		ctx.JSON(400, util.BadRequestException(e.Error()))
@@ -23,7 +24,7 @@ func Register(ctx *gin.Context) {
 }
 
 func Login(ctx *gin.Context) {
-	var jsonBody LoginRequest
+	var jsonBody dto.LoginRequest
 
 	if e := ctx.ShouldBindJSON(&jsonBody); e != nil {
 		ctx.JSON(400, util.BadRequestException(e.Error()))

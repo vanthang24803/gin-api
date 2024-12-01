@@ -12,6 +12,7 @@ import (
 )
 
 func Application() {
+	gin.SetMode(gin.ReleaseMode)
 	app := gin.Default()
 
 	PORT := util.GetEnv("PORT")
@@ -21,7 +22,7 @@ func Application() {
 
 	RegisterRouter(app)
 
-	log.Printf("Application listing on port %s", PORT)
+	log.Printf("Application listing on port %s ✔️", PORT)
 
 	if err := app.Run(fmt.Sprintf(":%s", PORT)); err != nil {
 		log.Panicf("Server error: %v", err)

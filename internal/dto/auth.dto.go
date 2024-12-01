@@ -1,4 +1,4 @@
-package auth
+package dto
 
 type RegisterRequest struct {
 	Email     string `json:"email"`
@@ -13,9 +13,10 @@ type LoginRequest struct {
 }
 
 type Payload struct {
-	Id       string `json:"id"`
-	Email    string `json:"email"`
-	FullName string `json:"fullName"`
+	Id       string   `json:"id"`
+	Email    string   `json:"email"`
+	FullName string   `json:"fullName"`
+	Roles    []string `json:"roles"`
 }
 
 type TokenResponse struct {

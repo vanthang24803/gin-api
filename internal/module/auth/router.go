@@ -9,8 +9,10 @@ import (
 func Router(app *gin.RouterGroup) {
 	auth := app.Group("/auth")
 
-	auth.GET("", middleware.AuthenticationMiddleware(), func(c *gin.Context) {
-		c.JSON(200, util.OK("Hello World"))
+	auth.GET("", middleware.AuthenticationMiddleware(), middleware.AuthorizationMiddleware([]string{"Customer"}), func(c *gin.Context) {
+		user, _ := c.Get("user")
+
+		c.JSON(200, util.OK(user))
 	})
 
 	auth.POST("/register", Register)

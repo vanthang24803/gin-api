@@ -20,7 +20,7 @@ type User struct {
 	LastName  string    `gorm:"column:last_name;not null" json:"lastName"`
 	Avatar    string    `gorm:"column:avatar" json:"avatar"`
 
-	Tokens []Token `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"tokens"`
+	Tokens []Token `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
 
 	Roles []Role `gorm:"many2many:user_roles;joinForeignKey:UserId;joinReferences:RoleId;constraint:OnCreate:CASCADE" json:"roles"`
 

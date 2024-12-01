@@ -22,7 +22,7 @@ type Token struct {
 	UpdatedAt time.Time `gorm:"column:updatedAt" json:"updatedAt"`
 }
 
-func (t *Token) BeforeCreate(tx *gorm.DB) (err error) {
+func (t *Token) BeforeCreate(ctx *gorm.DB) (err error) {
 	t.ID = uuid.New()
 	return nil
 }

@@ -29,7 +29,7 @@ func init() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	log.Println("Database connected successfully!")
+	log.Println("Database connected successfully! ✔️")
 }
 
 func GetDb() *gorm.DB {

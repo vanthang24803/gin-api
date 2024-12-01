@@ -6,6 +6,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/vanthang24803/api-ecommerce/internal/database"
+	"github.com/vanthang24803/api-ecommerce/internal/dto"
 	"github.com/vanthang24803/api-ecommerce/internal/models"
 	"github.com/vanthang24803/api-ecommerce/internal/util"
 	"golang.org/x/crypto/bcrypt"
@@ -13,15 +14,15 @@ import (
 )
 
 type Repository interface {
-	RegisterHandler(json *RegisterRequest) (interface{}, error)
-	LoginHandler(json *LoginRequest) (*TokenResponse, error)
+	RegisterHandler(json *dto.RegisterRequest) (interface{}, error)
+	LoginHandler(json *dto.LoginRequest) (*dto.TokenResponse, error)
 }
 
 type repos struct {
 	DB *gorm.DB
 }
 
-func (r *repos) RegisterHandler(json *RegisterRequest) (interface{}, error) {
+func (r *repos) RegisterHandler(json *dto.RegisterRequest) (interface{}, error) {
 	var existingUser models.User
 	if err := r.DB.Where("email = ?", json.Email).First(&existingUser).Error; err != nil && err != gorm.ErrRecordNotFound {
 		return nil, util.BadRequestException(err)
@@ -60,11 +61,12 @@ func (r *repos) RegisterHandler(json *RegisterRequest) (interface{}, error) {
 	return newAccount, nil
 }
 
-func (r *repos) LoginHandler(json *LoginRequest) (*TokenResponse, error) {
+func (r *repos) LoginHandler(json *dto.LoginRequest) (*dto.TokenResponse, error) {
 	var user models.User
 	var tokenAccount models.Token
+	var roles []string
 
-	if err := r.DB.Where("email = ?", json.Email).First(&user).Error; err != nil {
+	if err := r.DB.Preload("Roles").Where("email = ?", json.Email).First(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, util.UnauthorizedException()
 		}
@@ -76,9 +78,14 @@ func (r *repos) LoginHandler(json *LoginRequest) (*TokenResponse, error) {
 		return nil, util.UnauthorizedException()
 	}
 
-	accessToken, refreshToken, err := generateJWTToken(&Payload{
+	for _, role := range user.Roles {
+		roles = append(roles, role.Name)
+	}
+
+	accessToken, refreshToken, err := generateJWTToken(&dto.Payload{
 		Email:    user.Email,
 		FullName: user.FirstName + " " + user.LastName,
+		Roles:    roles,
 	})
 	if err != nil {
 		return nil, util.BadRequestException("Error generating token")
@@ -107,13 +114,13 @@ func (r *repos) LoginHandler(json *LoginRequest) (*TokenResponse, error) {
 		}
 	}
 
-	return &TokenResponse{
+	return &dto.TokenResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
 }
 
-func generateJWTToken(payload *Payload) (string, string, error) {
+func generateJWTToken(payload *dto.Payload) (string, string, error) {
 	accessTokenClaims := jwt.MapClaims{
 		"sub":     payload.Id,
 		"iat":     time.Now().Unix(),
