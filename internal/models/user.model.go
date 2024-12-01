@@ -22,7 +22,7 @@ type User struct {
 
 	Tokens []Token `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
 
-	Roles []Role `gorm:"many2many:user_roles;joinForeignKey:UserId;joinReferences:RoleId;constraint:OnCreate:CASCADE" json:"roles"`
+	Roles []Role `gorm:"many2many:user_roles;joinForeignKey:UserId;joinReferences:RoleId;constraint:OnCreate:CASCADE" json:"roles,omitempty"`
 
 	CreatedAt time.Time `gorm:"column:createdAt" json:"createdAt"`
 	UpdatedAt time.Time `gorm:"column:updatedAt" json:"updatedAt"`

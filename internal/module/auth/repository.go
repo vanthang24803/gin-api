@@ -16,6 +16,7 @@ import (
 type Repository interface {
 	RegisterHandler(json *dto.RegisterRequest) (interface{}, error)
 	LoginHandler(json *dto.LoginRequest) (*dto.TokenResponse, error)
+	LogoutHandler(payload *dto.Payload) (interface{}, error)
 }
 
 type repos struct {
@@ -61,6 +62,20 @@ func (r *repos) RegisterHandler(json *dto.RegisterRequest) (interface{}, error) 
 	return newAccount, nil
 }
 
+func (r *repos) LogoutHandler(payload *dto.Payload) (interface{}, error) {
+	var tokenAccount models.Token
+
+	if err := r.DB.Where("name = ? AND user_id = ?", "RefreshToken", payload.Id).First(&tokenAccount).Error; err != nil {
+		return nil, util.NotFoundException("Refresh token not found")
+	}
+
+	if err := r.DB.Delete(&tokenAccount).Error; err != nil {
+		return nil, util.BadRequestException("Failed to delete refresh token")
+	}
+
+	return "Logout successfully!", nil
+}
+
 func (r *repos) LoginHandler(json *dto.LoginRequest) (*dto.TokenResponse, error) {
 	var user models.User
 	var tokenAccount models.Token
@@ -84,6 +99,7 @@ func (r *repos) LoginHandler(json *dto.LoginRequest) (*dto.TokenResponse, error)
 
 	accessToken, refreshToken, err := generateJWTToken(&dto.Payload{
 		Email:    user.Email,
+		Id:       user.ID.String(),
 		FullName: user.FirstName + " " + user.LastName,
 		Roles:    roles,
 	})

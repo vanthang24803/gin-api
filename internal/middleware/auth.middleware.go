@@ -2,20 +2,18 @@ package middleware
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/vanthang24803/api-ecommerce/internal/database"
 	"github.com/vanthang24803/api-ecommerce/internal/dto"
-	"github.com/vanthang24803/api-ecommerce/internal/models"
 	"github.com/vanthang24803/api-ecommerce/internal/util"
 )
 
 func AuthenticationMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var user models.User
 		tokenStr := ctx.GetHeader("Authorization")
 
 		if tokenStr == "" {
@@ -59,12 +57,7 @@ func AuthenticationMiddleware() gin.HandlerFunc {
 					return
 				}
 
-				if err := database.GetDb().Preload("Roles").Where("email = ?", payload.Email).First(&user).Error; err != nil {
-					ctx.JSON(http.StatusUnauthorized, util.UnauthorizedException())
-					ctx.Abort()
-				}
-
-				ctx.Set("user", user)
+				ctx.Set("user", &payload)
 
 			} else {
 				log.Println("Payload not found in token")
@@ -92,7 +85,7 @@ func AuthorizationMiddleware(roles []string) gin.HandlerFunc {
 			return
 		}
 
-		currentUser, ok := user.(models.User)
+		currentUser, ok := user.(dto.Payload)
 		if !ok {
 			ctx.JSON(http.StatusUnauthorized, util.UnauthorizedException())
 			ctx.Abort()
@@ -102,7 +95,7 @@ func AuthorizationMiddleware(roles []string) gin.HandlerFunc {
 		hasRole := false
 		for _, role := range currentUser.Roles {
 			for _, requiredRole := range roles {
-				if role.Name == requiredRole {
+				if role == requiredRole {
 					hasRole = true
 					break
 				}
@@ -121,4 +114,18 @@ func AuthorizationMiddleware(roles []string) gin.HandlerFunc {
 
 		ctx.Next()
 	}
+}
+
+func GetCurrentUser(ctx *gin.Context) (*dto.Payload, error) {
+	userCtx, exists := ctx.Get("user")
+	if !exists {
+		return nil, errors.New("user not found in context")
+	}
+
+	currentUser, ok := userCtx.(*dto.Payload)
+	if !ok {
+		return nil, errors.New("invalid user data")
+	}
+
+	return currentUser, nil
 }
