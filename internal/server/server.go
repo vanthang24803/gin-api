@@ -19,6 +19,7 @@ func Application() {
 
 	app.Use(middleware.LoggerMiddleware())
 	app.Use(middleware.ErrorHandlingMiddleware())
+	app.Use(middleware.CorsMiddleware())
 
 	RegisterRouter(app)
 

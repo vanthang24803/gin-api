@@ -8,6 +8,8 @@ import (
 )
 
 func RegisterRouter(app *gin.Engine) {
+	app.MaxMultipartMemory = 5 << 20
+
 	app.NoRoute(func(c *gin.Context) {
 		c.JSON(404, util.NotFoundException("Not found route!"))
 	})

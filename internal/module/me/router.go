@@ -10,5 +10,6 @@ func Router(app *gin.RouterGroup) {
 
 	router.GET("", GetProfile)
 	router.PUT("", UpdateProfile)
+	router.POST("/avatar", UploadAvatar)
 
 }
